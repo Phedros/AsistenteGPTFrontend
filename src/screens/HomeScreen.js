@@ -49,14 +49,28 @@ const HomeScreen = ({ navigation }) => {
     setFilteredGpts(filtered);
   };
 
+  // Función para eliminar un GPT
+  const deleteGpt = async (id) => {
+    try {
+      await axios.delete(`http://10.0.2.2:5000/gpt/delete/${id}`);
+      Alert.alert('Éxito', 'GPT eliminado correctamente.');
+      fetchGpts(); // Actualiza la lista después de eliminar
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema al eliminar el GPT.');
+    }
+  };
+
   const renderItem = ({ item }) => (
     <Card style={styles.card}>
       <Card.Title title={item.name} left={(props) => <Icon {...props} name="robot-outline" size={30} color={colors.primary} />} />
       <Card.Content>
         <Text style={styles.gptDetails}>Modelo: {item.model}</Text>
-        <Text style={styles.gptDetails}>API Key: {item.apiKey}</Text>
       </Card.Content>
       <Card.Actions>
+        <Button mode="contained" icon="chat" onPress={() => navigation.navigate('ChatScreen', { gptId: item.id })}>
+          Chatear
+        </Button>
         <Button mode="outlined" icon="pencil" onPress={() => navigation.navigate('EditGPT', {
           gptId: item.id,
           initialName: item.name,
@@ -67,8 +81,8 @@ const HomeScreen = ({ navigation }) => {
         })}>
           Editar
         </Button>
-        <Button mode="contained" icon="chat" onPress={() => navigation.navigate('ChatScreen', { gptId: item.id })}>
-          Chatear
+        <Button mode="outlined" icon="delete" color="red" onPress={() => deleteGpt(item.id)}>
+          Eliminar
         </Button>
       </Card.Actions>
     </Card>
