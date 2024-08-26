@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 
@@ -6,6 +6,7 @@ const ChatScreen = ({ route }) => {
   const { gptId } = route.params; // Recibe el ID del GPT desde la navegación
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
+  const flatListRef = useRef(null); // Crear referencia para FlatList
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return; // No enviar mensajes vacíos
@@ -20,6 +21,9 @@ const ChatScreen = ({ route }) => {
         const gptMessage = { text: response.data.response, sender: 'gpt' };
         setMessages(prevMessages => [...prevMessages, userMessage, gptMessage]);
         setInputText('');
+
+        // Hacer scroll al final después de actualizar los mensajes
+        flatListRef.current.scrollToEnd({ animated: true });
       } else {
         console.error("No se recibió la respuesta esperada:", response.data);
       }
@@ -30,7 +34,7 @@ const ChatScreen = ({ route }) => {
 
   const renderMessage = ({ item }) => (
     <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.gptMessage]}>
-      <Text style={styles.messageText}>{item.text}</Text>
+      <Text style={[styles.messageText, item.sender === 'gpt' ? styles.gptMessageText : null]}>{item.text}</Text>
     </View>
   );
 
@@ -41,11 +45,13 @@ const ChatScreen = ({ route }) => {
       keyboardVerticalOffset={90}
     >
       <FlatList
+        ref={flatListRef} // Asignar la referencia a FlatList
         data={messages}
         keyExtractor={(item, index) => index.toString()}
         renderItem={renderMessage}
         contentContainerStyle={styles.chatContainer}
-        inverted // Muestra los mensajes más recientes en la parte inferior
+        onContentSizeChange={() => flatListRef.current.scrollToEnd({ animated: true })} // Desplazar al final cuando cambia el contenido
+        onLayout={() => flatListRef.current.scrollToEnd({ animated: true })} // Desplazar al final al cargar el layout
       />
       <View style={styles.inputContainer}>
         <TextInput
@@ -87,6 +93,9 @@ const styles = StyleSheet.create({
   },
   messageText: {
     color: '#ffffff',
+  },
+  gptMessageText: { // Nuevo estilo para el texto de los mensajes del GPT
+    color: '#000000', // Cambiado a negro para mejorar la legibilidad
   },
   inputContainer: {
     flexDirection: 'row',
