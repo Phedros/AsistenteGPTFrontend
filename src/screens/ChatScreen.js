@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
 import axios from 'axios';
 
 const ChatScreen = ({ route }) => {
@@ -62,6 +62,35 @@ const ChatScreen = ({ route }) => {
     }
   };
 
+  // Función para borrar la conversación
+  const clearConversation = async () => {
+    Alert.alert(
+      "Confirmar",
+      "¿Estás seguro de que deseas borrar la conversación?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel"
+        },
+        {
+          text: "Borrar",
+          onPress: async () => {
+            try {
+              const response = await axios.delete(`http://10.0.2.2:5000/gpt/history/delete/${gptId}`);
+              if (response.status === 200) {
+                setMessages([]); // Limpiar mensajes en el estado local
+              } else {
+                console.error("Error al borrar la conversación:", response.data);
+              }
+            } catch (error) {
+              console.error("Error al borrar la conversación:", error);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   const renderMessage = ({ item }) => (
     <View style={[styles.messageContainer, item.sender === 'user' ? styles.userMessage : styles.gptMessage]}>
       <Text style={[styles.messageText, item.sender === 'gpt' ? styles.gptMessageText : null]}>{item.text}</Text>
@@ -74,6 +103,12 @@ const ChatScreen = ({ route }) => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       keyboardVerticalOffset={90}
     >
+      {/* Botón para borrar conversación en la parte superior derecha */}
+      <View style={styles.headerContainer}>
+        <TouchableOpacity style={styles.clearButton} onPress={clearConversation}>
+          <Text style={styles.clearButtonText}>🗑</Text>
+        </TouchableOpacity>
+      </View>
       <FlatList
         ref={flatListRef} // Asignar la referencia a FlatList
         data={messages}
@@ -99,10 +134,14 @@ const ChatScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
-  // Estilos (sin cambios)
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',
+  },
+  headerContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    padding: 10,
   },
   chatContainer: {
     paddingHorizontal: 10,
@@ -156,6 +195,16 @@ const styles = StyleSheet.create({
   sendButtonText: {
     color: '#ffffff',
     fontWeight: 'bold',
+  },
+  clearButton: {
+    backgroundColor: '#ff0000',
+    padding: 5,
+    borderRadius: 15,
+  },
+  clearButtonText: {
+    color: '#ffffff',
+    fontWeight: 'bold',
+    fontSize: 12, // Reducido el tamaño de fuente para que el botón sea más pequeño
   },
 });
 
