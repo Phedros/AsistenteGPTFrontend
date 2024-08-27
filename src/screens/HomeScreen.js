@@ -12,12 +12,9 @@ const HomeScreen = ({ navigation }) => {
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
 
-  // Función para obtener la lista de GPTs desde el backend
   const fetchGpts = async () => {
     try {
       const response = await axios.get('http://10.0.2.2:5000/gpts');
-
-      // Ordena los GPTs alfabéticamente por nombre
       const sortedGpts = response.data.sort((a, b) => a.name.localeCompare(b.name));
 
       setGpts(sortedGpts);
@@ -49,12 +46,11 @@ const HomeScreen = ({ navigation }) => {
     setFilteredGpts(filtered);
   };
 
-  // Función para eliminar un GPT
   const deleteGpt = async (id) => {
     try {
       await axios.delete(`http://10.0.2.2:5000/gpt/delete/${id}`);
       Alert.alert('Éxito', 'GPT eliminado correctamente.');
-      fetchGpts(); // Actualiza la lista después de eliminar
+      fetchGpts();
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Hubo un problema al eliminar el GPT.');
@@ -90,6 +86,15 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
+      {/* Contenedor para el botón de configuración */}
+      <View style={styles.settingsButtonContainer}>
+        <IconButton
+          icon="cog"
+          size={24}
+          onPress={() => navigation.navigate('Settings')}
+        />
+      </View>
+
       {/* Logo y Título */}
       <Image source={require('../../assets/logo.webp')} style={styles.logo} />
       <Text style={styles.title}>Bienvenido a tu app GPT Manager</Text>
@@ -135,6 +140,12 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     backgroundColor: '#f7f9fc',
+  },
+  settingsButtonContainer: {
+    position: 'absolute',
+    top: 10,
+    right: 10,
+    zIndex: 1, // Asegura que esté por encima de otros elementos
   },
   logo: {
     width: 100,

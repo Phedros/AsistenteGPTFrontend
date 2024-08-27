@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { View, Text, TextInput, TouchableOpacity, FlatList, StyleSheet, KeyboardAvoidingView, Platform } from 'react-native';
 import axios from 'axios';
 
@@ -7,6 +7,36 @@ const ChatScreen = ({ route }) => {
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState('');
   const flatListRef = useRef(null); // Crear referencia para FlatList
+
+  // Función para mapear el historial recibido a formato usado por la app
+  const mapHistoryToMessages = (history) => {
+    return history.map(item => ({
+      text: item.content,
+      sender: item.role === 'user' ? 'user' : 'gpt'
+    }));
+  };
+
+  // Obtener historial de conversación al montar el componente
+  useEffect(() => {
+    const fetchHistory = async () => {
+      try {
+        const response = await axios.get(`http://10.0.2.2:5000/gpt/history/${gptId}`);
+        if (response.data) {
+          const formattedMessages = mapHistoryToMessages(response.data);
+          setMessages(formattedMessages); // Actualizar mensajes con historial formateado
+
+          // Desplazar al final después de cargar el historial
+          flatListRef.current.scrollToEnd({ animated: false });
+        } else {
+          console.error("No se recibió el historial esperado:", response.data);
+        }
+      } catch (error) {
+        console.error("Error al obtener el historial:", error);
+      }
+    };
+
+    fetchHistory();
+  }, [gptId]);
 
   const sendMessage = async () => {
     if (inputText.trim() === '') return; // No enviar mensajes vacíos
@@ -69,6 +99,7 @@ const ChatScreen = ({ route }) => {
 };
 
 const styles = StyleSheet.create({
+  // Estilos (sin cambios)
   container: {
     flex: 1,
     backgroundColor: '#f0f0f0',

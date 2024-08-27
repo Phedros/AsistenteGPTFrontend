@@ -5,6 +5,7 @@ import HomeScreen from './src/screens/HomeScreen';
 import CreateGPTScreen from './src/screens/CreateGPTScreen';
 import EditGPTScreen from './src/screens/EditGPTScreen';
 import ChatScreen from './src/screens/ChatScreen';
+import SettingsScreen from './src/screens/SettingsScreen';
 
 const Stack = createStackNavigator();
 
@@ -16,6 +17,7 @@ function App() {
         <Stack.Screen name="CreateGPT" component={CreateGPTScreen} />
         <Stack.Screen name="EditGPT" component={EditGPTScreen} />
         <Stack.Screen name="ChatScreen" component={ChatScreen} />
+        <Stack.Screen name="Settings" component={SettingsScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );
