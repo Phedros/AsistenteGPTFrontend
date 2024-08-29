@@ -70,9 +70,9 @@ const HomeScreen = ({ navigation }) => {
         <Button mode="outlined" icon="pencil" onPress={() => navigation.navigate('EditGPT', {
           gptId: item.id,
           initialName: item.name,
-          initialApiKey: item.apiKey,
+          initialApiKey: item.api_key,
           initialModel: item.model,
-          initialSystemMessage: item.systemMessage,
+          initialSystemMessage: item.system_message,
           onGPTUpdated: handleGPTCreatedOrUpdated
         })}>
           Editar
@@ -97,7 +97,7 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Logo y Título */}
       <Image source={require('../../assets/logo.webp')} style={styles.logo} />
-      <Text style={styles.title}>Bienvenido a tu app GPT Manager</Text>
+      <Text style={styles.title}>Welcome to Agent Manager</Text>
 
       {/* Barra de Búsqueda */}
       <Searchbar

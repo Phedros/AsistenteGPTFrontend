@@ -2,49 +2,32 @@ import axios from 'axios';
 import React from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 
-const CreateGPTScreen = ({ navigation, route }) => {
-  const [name, setName] = React.useState('');
+const ConfiguracionGPTScreen = ({ navigation, route }) => {
   const [apiKey, setApiKey] = React.useState('');
   const [model, setModel] = React.useState('');
-  const [systemMessage, setSystemMessage] = React.useState('');
 
-  const handleCreateGPT = async () => {
-    if (!name || !apiKey || !model || !systemMessage) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
-      return;
-    }
-
+  const handleGuardarConfiguracion = async () => {
     try {
-      const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
-        name,
+      const response = await axios.post('http://10.0.2.2:5000/settings/update', {
         api_key: apiKey,
         model,
-        system_message: systemMessage,
       });
-      if (response.status === 201) {
-        Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
-        if (route.params?.onGPTCreated) {
-          route.params.onGPTCreated(); // Llama al callback para refrescar la lista
-        }
+
+      if (response.status === 200) {
+        Alert.alert('Configuración Guardada', 'La configuración ha sido guardada exitosamente.');
         navigation.goBack(); // Regresa a la pantalla anterior
       }
     } catch (error) {
       console.error(error);
-      Alert.alert('Error', 'Hubo un problema al crear el GPT.');
+      Alert.alert('Error', 'Hubo un problema al guardar la configuración.');
     }
   };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Crear Nuevo GPT</Text>
+      <Text style={styles.title}>Configuración Global</Text>
 
       <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="Nombre del GPT"
-          value={name}
-          onChangeText={setName}
-        />
         <TextInput
           style={styles.input}
           placeholder="API Key"
@@ -58,18 +41,10 @@ const CreateGPTScreen = ({ navigation, route }) => {
           value={model}
           onChangeText={setModel}
         />
-        <TextInput
-          style={styles.input}
-          placeholder="Mensaje del sistema"
-          value={systemMessage}
-          onChangeText={setSystemMessage}
-          multiline
-          numberOfLines={3}
-        />
       </View>
 
-      <TouchableOpacity style={styles.createButton} onPress={handleCreateGPT}>
-        <Text style={styles.createButtonText}>Crear</Text>
+      <TouchableOpacity style={styles.createButton} onPress={handleGuardarConfiguracion}>
+        <Text style={styles.createButtonText}>Guardar Configuración</Text>
       </TouchableOpacity>
     </ScrollView>
   );
@@ -114,4 +89,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default CreateGPTScreen;
+export default ConfiguracionGPTScreen;

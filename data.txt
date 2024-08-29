@@ -1,4 +1,5 @@
 npx react-native start --reset-cache
+
 npx react-native run-android    
 
 taskkill /PID 21344 /F

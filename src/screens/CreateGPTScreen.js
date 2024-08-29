@@ -8,31 +8,32 @@ const CreateGPTScreen = ({ navigation, route }) => {
   const [model, setModel] = React.useState('');
   const [systemMessage, setSystemMessage] = React.useState('');
 
-  const handleCreateGPT = async () => {
-    if (!name || !apiKey || !model || !systemMessage) {
-      Alert.alert('Error', 'Todos los campos son obligatorios.');
-      return;
-    }
+const handleCreateGPT = async () => {
+  if (!name || !systemMessage) {
+    Alert.alert('Error', 'El nombre y el mensaje del sistema son obligatorios.');
+    return;
+  }
 
-    try {
-      const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
-        name,
-        api_key: apiKey,
-        model,
-        system_message: systemMessage,
-      });
-      if (response.status === 201) {
-        Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
-        if (route.params?.onGPTCreated) {
-          route.params.onGPTCreated(); // Llama al callback para refrescar la lista
-        }
-        navigation.goBack(); // Regresa a la pantalla anterior
+  try {
+    const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
+      name,
+      api_key: apiKey,  // Enviar tal cual, aunque sea vacío
+      model,
+      system_message: systemMessage,
+    });
+    if (response.status === 201) {
+      Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
+      if (route.params?.onGPTCreated) {
+        route.params.onGPTCreated(); // Llama al callback para refrescar la lista
       }
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema al crear el GPT.');
+      navigation.goBack(); // Regresa a la pantalla anterior
     }
-  };
+  } catch (error) {
+    console.error(error);
+    Alert.alert('Error', 'Hubo un problema al crear el GPT.');
+  }
+};
+
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
