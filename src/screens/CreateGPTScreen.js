@@ -4,7 +4,6 @@ import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView 
 
 const CreateGPTScreen = ({ navigation, route }) => {
   const [name, setName] = React.useState('');
-  const [apiKey, setApiKey] = React.useState('');
   const [model, setModel] = React.useState('');
   const [systemMessage, setSystemMessage] = React.useState('');
 
@@ -17,7 +16,6 @@ const handleCreateGPT = async () => {
   try {
     const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
       name,
-      api_key: apiKey,  // Enviar tal cual, aunque sea vacío
       model,
       system_message: systemMessage,
     });
@@ -45,13 +43,6 @@ const handleCreateGPT = async () => {
           placeholder="Nombre del GPT"
           value={name}
           onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="API Key"
-          value={apiKey}
-          onChangeText={setApiKey}
-          secureTextEntry // Para proteger la API Key
         />
         <TextInput
           style={styles.input}

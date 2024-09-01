@@ -6,7 +6,6 @@ const EditGPTScreen = ({ route, navigation }) => {
   const { gptId, initialName, initialApiKey, initialModel, initialSystemMessage, onGPTUpdated } = route.params;
 
   const [name, setName] = React.useState(initialName);
-  const [apiKey, setApiKey] = React.useState(initialApiKey);
   const [model, setModel] = React.useState(initialModel);
   const [systemMessage, setSystemMessage] = React.useState(initialSystemMessage);
 
@@ -14,7 +13,6 @@ const EditGPTScreen = ({ route, navigation }) => {
     try {
       const response = await axios.post(`http://10.0.2.2:5000/gpt/update/${gptId}`, {
         name,
-        api_key: apiKey,
         model,
         system_message: systemMessage,
       });
@@ -41,13 +39,6 @@ const EditGPTScreen = ({ route, navigation }) => {
           placeholder="Nuevo Nombre del GPT"
           value={name}
           onChangeText={setName}
-        />
-        <TextInput
-          style={styles.input}
-          placeholder="Nueva API Key"
-          value={apiKey}
-          onChangeText={setApiKey}
-          secureTextEntry // Para ocultar la API Key
         />
         <TextInput
           style={styles.input}
