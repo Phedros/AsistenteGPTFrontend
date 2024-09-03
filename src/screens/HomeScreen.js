@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, StyleSheet, TextInput, RefreshControl, Image } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, ActivityIndicator, Alert, StyleSheet, TextInput, RefreshControl } from 'react-native';
 import { Card, Button, IconButton, Searchbar, useTheme } from 'react-native-paper';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
@@ -84,7 +84,6 @@ const HomeScreen = ({ navigation }) => {
     </Card>
   );
 
-
   return (
     <View style={styles.container}>
       {/* Contenedor para el botón de configuración */}
@@ -96,8 +95,7 @@ const HomeScreen = ({ navigation }) => {
         />
       </View>
 
-      {/* Logo y Título */}
-      <Image source={require('../../assets/logo.webp')} style={styles.logo} />
+      {/* Título */}
       <Text style={styles.title}>Welcome to Agent Manager</Text>
 
       {/* Barra de Búsqueda */}
@@ -146,13 +144,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
     top: 10,
     right: 10,
-    zIndex: 1, // Asegura que esté por encima de otros elementos
-  },
-  logo: {
-    width: 100,
-    height: 100,
-    alignSelf: 'center',
-    marginBottom: 10,
+    zIndex: 1,
   },
   title: {
     fontSize: 26,
