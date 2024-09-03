@@ -64,8 +64,8 @@ const HomeScreen = ({ navigation }) => {
         <Text style={styles.gptDetails}>Modelo: {item.model}</Text>
       </Card.Content>
       <Card.Actions>
-        <Button mode="contained" icon="chat" onPress={() => navigation.navigate('ChatScreen', { gptId: item.id })}>
-          Chatear
+        <Button mode="contained" icon="chat" onPress={() => navigation.navigate('ConversationList', { gptId: item.id })}>
+          Convers
         </Button>
         <Button mode="outlined" icon="pencil" onPress={() => navigation.navigate('EditGPT', {
           gptId: item.id,
@@ -83,6 +83,7 @@ const HomeScreen = ({ navigation }) => {
       </Card.Actions>
     </Card>
   );
+
 
   return (
     <View style={styles.container}>
