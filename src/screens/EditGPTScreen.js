@@ -1,13 +1,21 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 
 const EditGPTScreen = ({ route, navigation }) => {
-  const { gptId, initialName, initialApiKey, initialModel, initialSystemMessage, onGPTUpdated } = route.params;
+  const { gptId, initialName, initialApiKey, initialModel, initialSystemMessage } = route.params;
 
   const [name, setName] = React.useState(initialName);
   const [model, setModel] = React.useState(initialModel);
   const [systemMessage, setSystemMessage] = React.useState(initialSystemMessage);
+
+  useEffect(() => {
+    if (route.params?.onGPTUpdated) {
+      navigation.setOptions({
+        onGPTUpdated: route.params.onGPTUpdated,
+      });
+    }
+  }, [navigation, route.params]);
 
   const handleEditGPT = async () => {
     try {
@@ -18,8 +26,8 @@ const EditGPTScreen = ({ route, navigation }) => {
       });
       if (response.status === 200) {
         Alert.alert('GPT Actualizado', 'El GPT ha sido actualizado exitosamente.');
-        if (onGPTUpdated) {
-          onGPTUpdated(); // Llama al callback para refrescar la lista en HomeScreen
+        if (navigation.getParam('onGPTUpdated')) {
+          navigation.getParam('onGPTUpdated')(); // Llama al callback para refrescar la lista en HomeScreen
         }
         navigation.goBack(); // Regresa a la pantalla anterior
       }

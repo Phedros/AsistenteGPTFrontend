@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, Alert, StyleSheet, ScrollView } from 'react-native';
 
 const CreateGPTScreen = ({ navigation, route }) => {
@@ -7,31 +7,39 @@ const CreateGPTScreen = ({ navigation, route }) => {
   const [model, setModel] = React.useState('');
   const [systemMessage, setSystemMessage] = React.useState('');
 
-const handleCreateGPT = async () => {
-  if (!name || !systemMessage) {
-    Alert.alert('Error', 'El nombre y el mensaje del sistema son obligatorios.');
-    return;
-  }
-
-  try {
-    const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
-      name,
-      model,
-      system_message: systemMessage,
-    });
-    if (response.status === 201) {
-      Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
-      if (route.params?.onGPTCreated) {
-        route.params.onGPTCreated(); // Llama al callback para refrescar la lista
-      }
-      navigation.goBack(); // Regresa a la pantalla anterior
+  useEffect(() => {
+    if (route.params?.onGPTCreated) {
+      navigation.setOptions({
+        onGPTCreated: route.params.onGPTCreated,
+      });
     }
-  } catch (error) {
-    console.error(error);
-    Alert.alert('Error', 'Hubo un problema al crear el GPT.');
-  }
-};
+  }, [navigation, route.params]);
 
+  const handleCreateGPT = async () => {
+    if (!name || !systemMessage) {
+      Alert.alert('Error', 'El nombre y el mensaje del sistema son obligatorios.');
+      return;
+    }
+
+    try {
+      const response = await axios.post('http://10.0.2.2:5000/gpt/create', {
+        name,
+        model,
+        system_message: systemMessage,
+      });
+      if (response.status === 201) {
+        Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
+        const onGPTCreated = navigation.getParam('onGPTCreated');
+        if (onGPTCreated) {
+          onGPTCreated(); // Llama al callback para refrescar la lista
+        }
+        navigation.goBack(); // Regresa a la pantalla anterior
+      }
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema al crear el GPT.');
+    }
+  };
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
