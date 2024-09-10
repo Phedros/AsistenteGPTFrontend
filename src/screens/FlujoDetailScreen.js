@@ -47,6 +47,10 @@ const FlujoDetailScreen = ({ route, navigation }) => {
       const response = await axios.post(`http://10.0.2.2:5000/flujo/conversation/create/${flujoId}`);
       const conversationId = response.data.conversation_id;
       Alert.alert('Conversación creada', `Conversación ID: ${conversationId}`);
+
+      // Refresca las conversaciones después de crear una nueva
+      await fetchConversaciones();
+
       navigation.navigate('RunFlujo', { flujoId, conversationId });
     } catch (error) {
       console.error('Error al crear la conversación:', error);
@@ -65,6 +69,25 @@ const FlujoDetailScreen = ({ route, navigation }) => {
     }
   };
 
+  const confirmDeleteConversacion = (conversationId) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar esta conversación?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          onPress: () => deleteConversacion(conversationId),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const renderItem = ({ item }) => (
     <Card style={styles.card}>
       <Card.Title title={`ID Conversación: ${item.id}`} />
@@ -80,7 +103,7 @@ const FlujoDetailScreen = ({ route, navigation }) => {
           mode="outlined"
           icon="delete"
           color="red"
-          onPress={() => deleteConversacion(item.id)}
+          onPress={() => confirmDeleteConversacion(item.id)}
         >
           Eliminar
         </Button>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, ActivityIndicator, Alert, StyleSheet, RefreshControl } from 'react-native';
-import { Card, Button, IconButton, Searchbar, useTheme, Checkbox } from 'react-native-paper'; // Agregamos Checkbox
+import { Card, Button, IconButton, Searchbar, useTheme, Checkbox } from 'react-native-paper';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -11,7 +11,7 @@ const HomeScreen = ({ navigation }) => {
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [searchText, setSearchText] = useState('');
-  const [selectedGpts, setSelectedGpts] = useState([]); // Estado para los GPTs seleccionados
+  const [selectedGpts, setSelectedGpts] = useState([]);
 
   // Obtener los GPTs disponibles
   const fetchGpts = async () => {
@@ -51,8 +51,60 @@ const HomeScreen = ({ navigation }) => {
   const toggleSelectGpt = (id) => {
     setSelectedGpts((prevSelectedGpts) =>
       prevSelectedGpts.includes(id)
-        ? prevSelectedGpts.filter((gptId) => gptId !== id) // Deseleccionar si ya está seleccionado
-        : [...prevSelectedGpts, id] // Seleccionar si no está seleccionado
+        ? prevSelectedGpts.filter((gptId) => gptId !== id)
+        : [...prevSelectedGpts, id]
+    );
+  };
+
+  // Confirmar la eliminación de un solo GPT
+  const confirmDeleteSingleGpt = (id) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este GPT?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          onPress: () => deleteSingleGpt(id),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
+  // Función para eliminar un solo GPT
+  const deleteSingleGpt = async (id) => {
+    try {
+      await axios.delete(`http://10.0.2.2:5000/gpt/delete/${id}`);
+      Alert.alert('Éxito', 'GPT eliminado correctamente.');
+      fetchGpts();
+    } catch (error) {
+      console.error(error);
+      Alert.alert('Error', 'Hubo un problema al eliminar el GPT.');
+    }
+  };
+
+  // Confirmar la eliminación de GPTs seleccionados
+  const confirmDeleteSelectedGpts = () => {
+    Alert.alert(
+      'Confirmar eliminación',
+      `¿Estás seguro de que quieres eliminar ${selectedGpts.length} GPT(s)?`,
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          onPress: () => deleteSelectedGpts(),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
     );
   };
 
@@ -62,7 +114,7 @@ const HomeScreen = ({ navigation }) => {
       const promises = selectedGpts.map((id) => axios.delete(`http://10.0.2.2:5000/gpt/delete/${id}`));
       await Promise.all(promises);
       Alert.alert('Éxito', 'GPTs eliminados correctamente.');
-      setSelectedGpts([]); // Limpiar la selección después de eliminar
+      setSelectedGpts([]);
       fetchGpts();
     } catch (error) {
       console.error(error);
@@ -77,8 +129,8 @@ const HomeScreen = ({ navigation }) => {
         left={(props) => <Icon {...props} name="robot-outline" size={30} color={colors.primary} />}
         right={() => (
           <Checkbox
-            status={selectedGpts.includes(item.id) ? 'checked' : 'unchecked'} // Marcar si está seleccionado
-            onPress={() => toggleSelectGpt(item.id)} // Cambiar selección
+            status={selectedGpts.includes(item.id) ? 'checked' : 'unchecked'}
+            onPress={() => toggleSelectGpt(item.id)}
           />
         )}
       />
@@ -109,7 +161,12 @@ const HomeScreen = ({ navigation }) => {
         >
           Editar
         </Button>
-        <Button mode="outlined" icon="delete" color="red" onPress={() => deleteGpt(item.id)}>
+        <Button
+          mode="outlined"
+          icon="delete"
+          color="red"
+          onPress={() => confirmDeleteSingleGpt(item.id)} // Confirmar eliminación de un solo GPT
+        >
           Eliminar
         </Button>
       </Card.Actions>
@@ -118,15 +175,12 @@ const HomeScreen = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      {/* Contenedor para el botón de configuración */}
       <View style={styles.settingsButtonContainer}>
         <IconButton icon="cog" size={24} onPress={() => navigation.navigate('Settings')} />
       </View>
 
-      {/* Título */}
       <Text style={styles.title}>Agent Manager</Text>
 
-      {/* Barra de Búsqueda */}
       <Searchbar
         placeholder="Buscar GPT..."
         onChangeText={handleSearch}
@@ -134,17 +188,15 @@ const HomeScreen = ({ navigation }) => {
         style={styles.searchBar}
       />
 
-      {/* Botón para ir a la lista de flujos */}
       <Button
         mode="contained"
         icon={({ size, color }) => <Icon name="source-branch" size={size} color={color} />}
-        style={[styles.createButton, styles.specialButton]} // Añadimos un estilo especial
+        style={[styles.createButton, styles.specialButton]}
         onPress={() => navigation.navigate('Flujos')}
       >
         Flujos
       </Button>
 
-      {/* Botón para Crear Nuevo GPT */}
       <Button
         mode="contained"
         icon="plus"
@@ -154,20 +206,18 @@ const HomeScreen = ({ navigation }) => {
         Crear GPT
       </Button>
 
-      {/* Botón para Eliminar GPTs seleccionados */}
       {selectedGpts.length > 0 && (
         <Button
           mode="contained"
           icon="delete"
           color="red"
-          onPress={deleteSelectedGpts}
+          onPress={confirmDeleteSelectedGpts}
           style={styles.deleteButton}
         >
           Eliminar {selectedGpts.length} GPTs
         </Button>
       )}
 
-      {/* Lista de GPTs */}
       {loading ? (
         <ActivityIndicator size="large" color={colors.primary} style={styles.loading} />
       ) : (
@@ -211,11 +261,11 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
   },
   specialButton: {
-    backgroundColor: '#6200ea', // Un color más llamativo
-    borderColor: '#3700b3', // Borde llamativo
+    backgroundColor: '#6200ea',
+    borderColor: '#3700b3',
     borderWidth: 2,
-    borderRadius: 10, // Bordes más redondeados
-    paddingVertical: 8, // Aumentar el tamaño del botón
+    borderRadius: 10,
+    paddingVertical: 8,
   },
   deleteButton: {
     marginBottom: 16,

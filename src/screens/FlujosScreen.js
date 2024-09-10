@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, FlatList, ActivityIndicator, Alert, StyleSheet, RefreshControl, Text } from 'react-native';
-import { Card, Button, IconButton, Searchbar, useTheme } from 'react-native-paper';
+import { Card, Button, Searchbar, useTheme } from 'react-native-paper';
 import axios from 'axios';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 
@@ -53,6 +53,25 @@ const FlujosScreen = ({ navigation }) => {
     }
   };
 
+  const confirmDeleteFlujo = (flujoId) => {
+    Alert.alert(
+      'Confirmar eliminación',
+      '¿Estás seguro de que quieres eliminar este flujo?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Eliminar',
+          onPress: () => deleteFlujo(flujoId),
+          style: 'destructive',
+        },
+      ],
+      { cancelable: true }
+    );
+  };
+
   const renderFlujo = ({ item }) => (
     <Card style={styles.card}>
       <Card.Title
@@ -71,7 +90,7 @@ const FlujosScreen = ({ navigation }) => {
           mode="outlined"
           icon="delete"
           color="red"
-          onPress={() => deleteFlujo(item.id)}
+          onPress={() => confirmDeleteFlujo(item.id)}
         >
           Eliminar
         </Button>

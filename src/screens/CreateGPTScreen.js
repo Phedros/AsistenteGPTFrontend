@@ -7,14 +7,6 @@ const CreateGPTScreen = ({ navigation, route }) => {
   const [model, setModel] = React.useState('');
   const [systemMessage, setSystemMessage] = React.useState('');
 
-  useEffect(() => {
-    if (route.params?.onGPTCreated) {
-      navigation.setOptions({
-        onGPTCreated: route.params.onGPTCreated,
-      });
-    }
-  }, [navigation, route.params]);
-
   const handleCreateGPT = async () => {
     if (!name || !systemMessage) {
       Alert.alert('Error', 'El nombre y el mensaje del sistema son obligatorios.');
@@ -29,7 +21,7 @@ const CreateGPTScreen = ({ navigation, route }) => {
       });
       if (response.status === 201) {
         Alert.alert('GPT Creado', 'Tu nuevo GPT ha sido creado exitosamente.');
-        const onGPTCreated = navigation.getParam('onGPTCreated');
+        const onGPTCreated = route.params?.onGPTCreated; // Actualización aquí
         if (onGPTCreated) {
           onGPTCreated(); // Llama al callback para refrescar la lista
         }
