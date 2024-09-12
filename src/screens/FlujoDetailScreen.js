@@ -16,18 +16,24 @@ const FlujoDetailScreen = ({ route, navigation }) => {
     fetchConversaciones();
   }, []);
 
-  const fetchConversaciones = async () => {
-    try {
-      const response = await axios.get(`http://10.0.2.2:5000/flujo/${flujoId}/conversaciones`);
-      setConversaciones(response.data);
-      setFilteredConversaciones(response.data);
-      setLoading(false);
-    } catch (error) {
-      console.error(error);
-      Alert.alert('Error', 'Hubo un problema al obtener las conversaciones.');
-      setLoading(false);
-    }
-  };
+    const fetchConversaciones = async (retryCount = 3) => {
+        try {
+            const response = await axios.get(`http://10.0.2.2:5000/flujo/${flujoId}/conversaciones`);
+            setConversaciones(response.data);
+            setFilteredConversaciones(response.data);
+            setLoading(false);
+        } catch (error) {
+            if (retryCount > 0) {
+                console.log(`Reintentando obtener las conversaciones... quedan ${retryCount} intentos`);
+                setTimeout(() => fetchConversaciones(retryCount - 1), 2000); // Espera 2 segundos antes de reintentar
+            } else {
+                console.error(error);
+                Alert.alert('Error', 'Hubo un problema al obtener las conversaciones.');
+                setLoading(false);
+            }
+        }
+    };
+
 
   const handleSearch = (text) => {
     setSearchText(text);

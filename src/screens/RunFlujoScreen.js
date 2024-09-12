@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { View, FlatList, ActivityIndicator, StyleSheet, Alert } from 'react-native';
-import { TextInput, Button, Card, Text, useTheme } from 'react-native-paper';
+import { View, FlatList, ActivityIndicator, StyleSheet, Alert, Clipboard } from 'react-native';
+import { TextInput, Button, Card, Text, IconButton, useTheme } from 'react-native-paper';
 import axios from 'axios';
 
 const RunFlujoScreen = ({ route }) => {
@@ -65,11 +65,26 @@ const RunFlujoScreen = ({ route }) => {
     loadHistorial();
   }, []);
 
+  const handleCopyToClipboard = (text) => {
+    Clipboard.setString(text);
+    Alert.alert('Copiado', 'Texto copiado al portapapeles');
+  };
+
   const renderAgenteResponse = ({ item }) => (
     <Card style={styles.card}>
       <Card.Content>
-        <Text style={styles.agentName}>Agente {item.position}: {item.agent_name}</Text>
-        <Text style={styles.response}>{item.response}</Text>
+        <View style={styles.cardHeader}>
+          <Text style={styles.agentName}>Agente {item.position}: {item.agent_name}</Text>
+          <IconButton
+            icon="content-copy"
+            size={20}
+            onPress={() => handleCopyToClipboard(item.response)}
+            style={styles.copyButton}
+          />
+        </View>
+        <Text style={styles.response} selectable={true}>
+          {item.response}
+        </Text>
       </Card.Content>
     </Card>
   );
@@ -129,11 +144,19 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     elevation: 4,
   },
+  cardHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
   agentName: {
     fontWeight: 'bold',
     fontSize: 16,
     marginBottom: 4,
     color: '#333',
+  },
+  copyButton: {
+    margin: -8,  // Ajusta el margen para el botón de copia para que no sea demasiado grande
   },
   response: {
     fontSize: 14,
